@@ -14,6 +14,12 @@ const getUsers = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
     try {
+        const targetUserId = parseInt(req.params.id);
+
+        // If not admin, user can only get their own account
+        if (req.user.role !== "admin" && req.user.id !== targetUserId) {
+            return next(new ApiError("Forbidden: you can only see your own account", 403));
+        }
         const user = await getUserByIdService(req.params);
         if (!user) throw new ApiError("User not found", 404);
         res.status(200).json(user);
