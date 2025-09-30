@@ -1,6 +1,6 @@
 import express from "express";
 import { createUser, getUsers, getUserById, getUserByEmail, updateUser, deleteUser } from "../controllers/userController.js";
-import verifyToken from "../middlewares/jwtMiddleware.js";
+import { verifyToken } from "../middlewares/jwtMiddleware.js";
 import authorizeRole from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();

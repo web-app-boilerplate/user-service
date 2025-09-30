@@ -4,15 +4,34 @@ import { ApiError } from "../errors/ApiError.js";
 
 const prisma = new PrismaClient();
 
-const getUsersService = async (page = 1, limit = 10) => {
-    logger.info(`Fetching users page: ${page}, limit: ${limit}`);
+// service
+const getUsersService = async (page = 1, limit = 10, search = "", role, sort = 'desc') => {
+    logger.info(`Fetching users page: ${page}, limit: ${limit}, search: ${search}, role: ${role}`);
 
+    // Build filters dynamically
+    const where = {};
+
+    if (search && search.length >= 3) {
+        where.OR = [
+            { name: { contains: search, mode: "insensitive" } },
+            { email: { contains: search, mode: "insensitive" } },
+        ];
+    }
+
+    if (role) {
+        where.role = role;
+    }
+
+    // Fetch users with filters + pagination
     const users = await prisma.user.findMany({
+        where,
         skip: (page - 1) * limit,
         take: limit,
+        orderBy: { createdAt: sort ? sort : "desc" }, // optional, but helps sort
     });
 
-    const totalUsers = await prisma.user.count();
+    // Count total for pagination
+    const totalUsers = await prisma.user.count({ where });
 
     return {
         users,

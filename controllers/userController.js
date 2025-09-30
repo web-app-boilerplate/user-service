@@ -3,8 +3,8 @@ import { ApiError } from "../errors/ApiError.js";
 
 const getUsers = async (req, res, next) => {
     try {
-        const { page = 1, limit = 10 } = req.query;
-        const result = await getUsersService(parseInt(page), parseInt(limit));
+        const { page = 1, limit = 10, search = "", role, sort = 'desc' } = req.query;
+        const result = await getUsersService(parseInt(page), parseInt(limit), search, role, sort);
         res.status(200).json(result);
     } catch (err) {
         next(err);
